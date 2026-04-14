@@ -97,11 +97,11 @@ class PairwiseCosineSimilarityTransformer(
                 idx * F.lit(embedding_dim) + F.lit(1),
                 embedding_dim,
             )
-            zipped = F.arrays_zip(query_col, candidate)
+            zipped = F.arrays_zip(query_col.alias("q"), candidate.alias("c"))
             dot = F.aggregate(
                 zipped,
                 F.lit(0.0).cast("double"),
-                lambda acc, pair: acc + (pair["0"] * pair["1"]).cast("double"),
+                lambda acc, pair: acc + (pair["q"] * pair["c"]).cast("double"),
             )
             cand_norm = F.sqrt(
                 F.aggregate(
