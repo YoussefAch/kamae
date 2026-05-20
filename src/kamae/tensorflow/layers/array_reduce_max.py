@@ -37,7 +37,7 @@ class ArrayReduceMaxLayer(BaseLayer):
 
     @enforce_single_tensor_input
     def _call(self, inputs: Tensor, **kwargs: Any) -> Tensor:
-        result = tf.reduce_max(inputs, axis=-1)
+        result = tf.reduce_max(inputs, axis=-1, keepdims=True)
         return tf.where(
             tf.math.is_nan(result),
             tf.constant(self.default_value, dtype=result.dtype),
