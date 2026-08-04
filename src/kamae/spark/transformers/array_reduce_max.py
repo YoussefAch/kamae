@@ -102,4 +102,5 @@ class ArrayReduceMaxTransformer(
             input_dtype=self.getInputKerasDtype(),
             output_dtype=self.getOutputKerasDtype(),
             default_value=self.getDefaultValue(),
+            keepdims=True
         )

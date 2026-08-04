@@ -27,10 +27,9 @@ from kamae.keras.core.utils.input_utils import enforce_single_tensor_input
 class ArrayReduceMaxLayer(BaseLayer):
     """
     Reduces the last dimension of a tensor by taking the maximum.
-
     Input:  (..., N)
-    Output: (...)
-
+    Output: (...) if keepdims=False (default)
+            (..., 1) if keepdims=True
     NaN values in the result are replaced with the configured default_value.
     """
 
@@ -43,12 +42,14 @@ class ArrayReduceMaxLayer(BaseLayer):
         input_dtype: Optional[str] = None,
         output_dtype: Optional[str] = None,
         default_value: float = 0.0,
+        keepdims: bool = False,
         **kwargs: Any,
     ) -> None:
         super().__init__(
             name=name, input_dtype=input_dtype, output_dtype=output_dtype, **kwargs
         )
         self.default_value = default_value
+        self.keepdims = keepdims
 
     @property
     def compatible_dtypes(self) -> Optional[List[str]]:
@@ -61,7 +62,7 @@ class ArrayReduceMaxLayer(BaseLayer):
 
     @enforce_single_tensor_input
     def _call(self, inputs: KerasTensor, **kwargs: Any) -> KerasTensor:
-        result = ops.max(inputs, axis=-1)
+        result = ops.max(inputs, axis=-1, keepdims=self.keepdims)
         return ops.where(
             ops.isnan(result),
             ops.cast(self.default_value, dtype=result.dtype),
@@ -70,5 +71,5 @@ class ArrayReduceMaxLayer(BaseLayer):
 
     def get_config(self) -> Dict[str, Any]:
         config = super().get_config()
-        config.update({"default_value": self.default_value})
+        config.update({"default_value": self.default_value, "keepdims": self.keepdims})
         return config
