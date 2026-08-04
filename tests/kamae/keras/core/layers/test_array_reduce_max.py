@@ -82,20 +82,22 @@ class TestArrayReduceMax:
         assert config["default_value"] == 5.0
         assert config["name"] == "config_test"
         assert config["keepdims"] is False  # default
-        layer_keepdims = ArrayReduceMaxLayer(name="config_keepdims", keepdims=True)
-        assert layer_keepdims.get_config()["keepdims"] is True
+        layer_kd = ArrayReduceMaxLayer(name="config_keepdims", keepdims=True)
+        assert layer_kd.get_config()["keepdims"] is True
 
-    def test_keepdims_preserves_rank(self):
-        # Without keepdims (default): (batch, list_size, N) -> (batch, list_size)
-        layer_no_keepdims = ArrayReduceMaxLayer(name="no_keepdims", keepdims=False)
+    def test_keepdims_false_drops_last_dim(self):
+        layer = ArrayReduceMaxLayer(name="no_keepdims", keepdims=False)
         input_tensor = tf.constant([[[1.0, 3.0, 2.0], [5.0, 4.0, 6.0]]])  # (1, 2, 3)
-        assert layer_no_keepdims(input_tensor).shape == (1, 2)
-        # With keepdims=True: (batch, list_size, N) -> (batch, list_size, 1)
-        layer_keepdims = ArrayReduceMaxLayer(name="with_keepdims", keepdims=True)
-        assert layer_keepdims(input_tensor).shape == (1, 2, 1)
-        # Values are identical regardless of keepdims
+        assert layer(input_tensor).shape == (1, 2)
+        
+    def test_keepdims_true_preserves_rank(self):
+        layer = ArrayReduceMaxLayer(name="with_keepdims", keepdims=True)
+        input_tensor = tf.constant([[[1.0, 3.0, 2.0], [5.0, 4.0, 6.0]]])  # (1, 2, 3)
+        output = layer(input_tensor)
+        assert output.shape == (1, 2, 1)
+        # Values are the same regardless of keepdims
         tf.debugging.assert_near(
-            tf.squeeze(layer_keepdims(input_tensor), axis=-1),
-            layer_no_keepdims(input_tensor),
+            tf.squeeze(output, axis=-1),
+            tf.constant([[3.0, 6.0]]),
             atol=1e-6,
         )

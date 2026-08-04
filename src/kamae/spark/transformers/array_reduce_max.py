@@ -52,6 +52,14 @@ class ArrayReduceMaxTransformer(
         typeConverter=TypeConverters.toFloat,
     )
 
+    keepdims = Param(
+        Params._dummy(),
+        "keepdims",
+        "Whether to keep the reduced dimension as size 1. "
+        "Set to True to preserve rank for pipeline compatibility.",
+        typeConverter=TypeConverters.toBoolean,
+    )
+
     @keyword_only
     def __init__(
         self,
@@ -61,9 +69,10 @@ class ArrayReduceMaxTransformer(
         outputDtype: Optional[str] = None,
         layerName: Optional[str] = None,
         defaultValue: float = 0.0,
+        keepdims: bool = True
     ) -> None:
         super().__init__()
-        self._setDefault(defaultValue=0.0)
+        self._setDefault(defaultValue=0.0, keepdims=True)
         kwargs = self._input_kwargs
         self.setParams(**kwargs)
 
@@ -72,6 +81,12 @@ class ArrayReduceMaxTransformer(
 
     def getDefaultValue(self) -> float:
         return self.getOrDefault(self.defaultValue)
+    
+    def setKeepdims(self, value: bool) -> "ArrayReduceMaxTransformer":
+        return self._set(keepdims=value)
+
+    def getKeepdims(self) -> bool:
+        return self.getOrDefault(self.keepdims)
 
     @property
     def compatible_dtypes(self) -> Optional[List[DataType]]:
@@ -102,5 +117,5 @@ class ArrayReduceMaxTransformer(
             input_dtype=self.getInputKerasDtype(),
             output_dtype=self.getOutputKerasDtype(),
             default_value=self.getDefaultValue(),
-            keepdims=True
+            keepdims=self.getKeepdims()
         )
