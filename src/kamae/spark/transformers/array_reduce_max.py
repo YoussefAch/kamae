@@ -69,7 +69,7 @@ class ArrayReduceMaxTransformer(
         outputDtype: Optional[str] = None,
         layerName: Optional[str] = None,
         defaultValue: float = 0.0,
-        keepdims: bool = True
+        keepdims: bool = True,
     ) -> None:
         super().__init__()
         self._setDefault(defaultValue=0.0, keepdims=True)
@@ -81,7 +81,7 @@ class ArrayReduceMaxTransformer(
 
     def getDefaultValue(self) -> float:
         return self.getOrDefault(self.defaultValue)
-    
+
     def setKeepdims(self, value: bool) -> "ArrayReduceMaxTransformer":
         return self._set(keepdims=value)
 
@@ -117,5 +117,5 @@ class ArrayReduceMaxTransformer(
             input_dtype=self.getInputKerasDtype(),
             output_dtype=self.getOutputKerasDtype(),
             default_value=self.getDefaultValue(),
-            keepdims=self.getKeepdims()
+            keepdims=self.getKeepdims(),
         )

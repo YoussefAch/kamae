@@ -89,7 +89,7 @@ class TestArrayReduceMax:
         layer = ArrayReduceMaxLayer(name="no_keepdims", keepdims=False)
         input_tensor = tf.constant([[[1.0, 3.0, 2.0], [5.0, 4.0, 6.0]]])  # (1, 2, 3)
         assert layer(input_tensor).shape == (1, 2)
-        
+
     def test_keepdims_true_preserves_rank(self):
         layer = ArrayReduceMaxLayer(name="with_keepdims", keepdims=True)
         input_tensor = tf.constant([[[1.0, 3.0, 2.0], [5.0, 4.0, 6.0]]])  # (1, 2, 3)
